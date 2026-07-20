@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>730스킨 이어리플렉서 줌교육 신청</title>
+<title>730스킨이어테라피 세미나 신청하기</title>
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-GG2SP7JBVY"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -59,6 +59,7 @@
     font-size:13px; color:var(--ink-soft); background:#FDFCFA; transition:all .15s ease;
   }
   .chip input:checked + span{ background:var(--sage); border-color:var(--sage); color:#fff; font-weight:600; }
+  .chip input:checked + span.type-span{ background:var(--terracotta); border-color:var(--terracotta); }
   .submit-btn{
     width:100%; margin-top:6px; padding:15px; border:none; border-radius:12px;
     background:var(--terracotta); color:#fff; font-size:15.5px; font-weight:700;
@@ -78,6 +79,7 @@
     color:#391B1B; font-weight:700; font-size:15.5px; text-decoration:none; box-sizing:border-box;
   }
   .gold-line{ width:36px;height:2px; background:var(--gold); margin:0 auto 18px; }
+  .seminar-date{ font-size:12.5px; font-weight:600; color:var(--terracotta); letter-spacing:0.02em; margin:0 0 14px; }
 </style>
 </head>
 <body>
@@ -88,7 +90,7 @@
   </div>
   <div class="card">
     <div id="form-state">
-      <h1>이어리플렉서<br><em>줌 교육</em> 신청</h1>
+      <h1>730스킨이어테라피<br><em>세미나</em> 신청하기</h1>
       <p class="desc">신청서 작성 후 안내에 따라 카카오톡 단체방에 입장하시면<br>교육 일정과 자료를 순서대로 안내드립니다.</p>
       <form id="signup-form">
         <div class="field">
@@ -98,6 +100,13 @@
         <div class="field">
           <label>연락처 <span class="req">*</span></label>
           <input type="tel" id="f-phone" placeholder="010-0000-0000" autocomplete="tel">
+        </div>
+        <div class="field">
+          <label>신청자 유형 <span class="req">*</span></label>
+          <div class="chip-group" id="f-type">
+            <label class="chip"><input type="radio" name="applicant-type" value="사업자"><span class="type-span">사업자 (샵 운영)</span></label>
+            <label class="chip"><input type="radio" name="applicant-type" value="일반"><span class="type-span">일반</span></label>
+          </div>
         </div>
         <div class="field">
           <label>참여 목적 <span class="req">*</span> <span style="font-weight:400;color:var(--ink-soft);">(중복 선택 가능)</span></label>
@@ -119,8 +128,9 @@
       </div>
       <div class="gold-line"></div>
       <h2>신청이 완료되었습니다</h2>
-      <p>아래 버튼을 눌러 카카오톡 단체방에<br>입장해주세요. 교육 일정을 안내드릴게요.</p>
-      <a href="https://open.kakao.com/o/gCgbSSDi" target="_blank" class="kakao-btn" id="kakao-btn">카카오톡 단체방 입장하기</a>
+      <p>카카오톡 오픈채팅을 시작해 보세요.<br>링크를 선택하면 카카오톡이 실행됩니다.</p>
+      <div class="seminar-date">26년 8월 7일 서울세미나</div>
+      <a href="https://open.kakao.com/o/ghqeHZEi" target="_blank" class="kakao-btn" id="kakao-btn">카카오톡 오픈채팅 시작하기</a>
     </div>
   </div>
 </div>
@@ -133,16 +143,18 @@
     e.preventDefault();
     const name = document.getElementById('f-name').value.trim();
     const phone = document.getElementById('f-phone').value.trim();
+    const typeCheck = document.querySelector('#f-type input:checked');
+    const applicantType = typeCheck ? typeCheck.value : '';
     const purposeChecks = document.querySelectorAll('#f-purpose input:checked');
     const purpose = Array.from(purposeChecks).map(c => c.value).join(', ');
-    if(!name || !phone || purposeChecks.length === 0){
+    if(!name || !phone || !applicantType || purposeChecks.length === 0){
       errorMsg.style.display = 'block';
       return;
     }
     errorMsg.style.display = 'none';
     submitBtn.disabled = true;
     submitBtn.textContent = '전송 중...';
-    const payload = { name: name, phone: phone, purpose: purpose, timestamp: new Date().toISOString() };
+    const payload = { name: name, phone: phone, applicantType: applicantType, purpose: purpose, timestamp: new Date().toISOString() };
     fetch(SHEET_ENDPOINT, {
       method: 'POST',
       mode: 'no-cors',
@@ -150,7 +162,7 @@
       body: JSON.stringify(payload)
     }).catch(function(err){ console.error('Sheet save failed', err); });
     if(typeof gtag === 'function'){
-      gtag('event', 'signup_complete', { event_category: 'ear_reflexer_zoom', purpose: purpose });
+      gtag('event', 'signup_complete', { event_category: 'ear_reflexer_zoom', purpose: purpose, applicant_type: applicantType });
     }
     document.getElementById('form-state').style.display = 'none';
     document.getElementById('success-state').style.display = 'block';
